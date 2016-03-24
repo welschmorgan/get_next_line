@@ -1,7 +1,4 @@
 #include "get_next_line.h"
-#include <libft_dlist.h>
-#include <libft_memory.h>
-#include <libft_string.h>
 #include <unistd.h>
 
 t_fd			*ft_init_fd(t_fd *fd, int const fdi)

@@ -7,7 +7,7 @@ LIBFT=../libft
 LDFLAGS=
 DBGFLAGS=
 #-ggdb -D_DEBUG
-CFLAGS=-I$(LIBFT) -I$(LIBFT)/includes -I./ -I../ -ggdb -Wall -Werror -Wextra -std=c89 $(DBGFLAGS)
+CFLAGS=-I$(LIBFT) -I$(LIBFT)/includes -I./ -I../ -ggdb -Wall -Werror -Wextra $(DBGFLAGS)
 
 CC=clang
 LD=$(CC)
