@@ -1,2 +1,3 @@
 *.o
-test/{gnl,*.o}
+test/gnl
+test/*.o
