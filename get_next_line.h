@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:07 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/25 11:20:10 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/25 11:56:13 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,15 +19,19 @@
 # define BUFF_SIZE		5
 # define FD_MAX			255
 
+# define SHOW_LAST_LINE	1
+
 # define READ_OK		1
 # define READ_EOF		0
 # define READ_ERR		-1
+
 
 typedef struct	s_fd
 {
 	int			fd;
 	int			init;
 	int			code;
+	int			stop;
 	int			count;
 	char		buf[BUFF_SIZE];
 	t_dlist		block;
@@ -43,3 +47,8 @@ t_fd			*ft_init_fd(t_fd *fd, int const fdi);
 int				get_next_line(int const fd, char **line);
 
 #endif
+
+
+
+
+

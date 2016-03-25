@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:17 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/25 11:22:30 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/25 13:39:20 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ t_fd			*ft_init_fd(t_fd *fd, int const fdi)
 	fd->init = TRUE;
 	fd->code = READ_OK;
 	fd->count = 0;
+	fd->stop = FALSE;
 	ft_bzero(fd->buf, BUFF_SIZE);
 	ft_dlist_init(&fd->block);
 	ft_dlist_init(&fd->lines);
@@ -43,7 +44,7 @@ int				ft_read_fd(t_fd *fd)
 		fd->code = READ_EOF;
 	if (fd->code == READ_ERR)
 		return (fd->code);
-	if (fd->code == READ_OK)
+	if (fd->code != READ_ERR) // == READ_OK
 	{
 		ptr = fd->buf;
 		while (ptr < (fd->buf + fd->count) && *ptr)
@@ -88,12 +89,19 @@ int				ft_process_fd(t_fd *fd, char **line)
 
 	if (fd->code == READ_ERR)
 		return (fd->code);
+	if (fd->block.tail)
+		ft_push_fd(fd);
 	fd->code = READ_OK;
-	if (*line)
-		ft_strdel(line);
+	/*if (*line)
+	  ft_strdel(line);*/
 	cur = fd->lines.tail;
 	if (cur)
-		*line = ft_strdup((char*)cur->data);
+	{
+		/**line = ft_strdup((char*)cur->data);
+		 */
+		*line = cur->data;
+		cur->data = NULL;
+	}
 	ft_dlist_remove(&fd->lines,
 					&cur,
 					ft_dlist_deleter);
@@ -101,7 +109,9 @@ int				ft_process_fd(t_fd *fd, char **line)
 	{
 		ft_dlist_clear(&fd->lines, ft_dlist_deleter);
 		ft_dlist_clear(&fd->block, ft_dlist_deleter);
+		fd->stop = TRUE;
 		fd->code = READ_EOF;
+		return (READ_OK);
 	}
 	return (fd->code);
 }
@@ -111,12 +121,15 @@ int				get_next_line(int const fd, char **line)
 	static t_fd	fds[FD_MAX];
 	t_fd		*pfd;
 
-	if (fd < 0 || fd >= FD_MAX)
+	if (fd < 0 || fd >= FD_MAX || !line)
 		return (READ_ERR);
+	*line = NULL;
 	pfd = &fds[fd];
 	ft_init_fd(pfd, fd);
 	if (pfd->lines.tail)
 		return (ft_process_fd(pfd, line));
+	else if (pfd->stop)
+		return (pfd->code);
 	while (pfd->code == READ_OK)
 	{
 		ft_read_fd(pfd);
