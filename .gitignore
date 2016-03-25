@@ -1,1 +1,4 @@
+*.dSYM
 *.o
+test_gnl
+two_lines_of_08
