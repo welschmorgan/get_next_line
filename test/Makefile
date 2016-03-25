@@ -21,7 +21,7 @@ $(TARGET): $(OBJS) $(LIBFT)/libft.a
 $(LIBFT)/%.a: lib
 
 lib:
-	@make all --no-print-directory -C $(LIBFT)
+	@make libft.a --no-print-directory -C $(LIBFT)
 
 %.o: %.c
 	@printf "Compile '%s':\n" $^

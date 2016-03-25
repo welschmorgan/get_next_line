@@ -1,5 +1,17 @@
-#ifndef GET_LINE_HH
-# define GET_LINE_HH
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2016/03/25 11:20:07 by mwelsch           #+#    #+#             */
+/*   Updated: 2016/03/25 11:20:10 by mwelsch          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef GET_NEXT_LINE_H
+# define GET_NEXT_LINE_H
 
 # include <stddef.h>
 # include <libft.h>

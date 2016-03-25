@@ -1,5 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2016/03/25 11:20:17 by mwelsch           #+#    #+#             */
+/*   Updated: 2016/03/25 11:22:30 by mwelsch          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line.h"
 #include <unistd.h>
+
+#define PUSH_BLOCK(LST, DATA) ft_dlist_push_back_str(LST, DATA, NF_DESTROY_ALL)
 
 t_fd			*ft_init_fd(t_fd *fd, int const fdi)
 {
@@ -37,9 +51,7 @@ int				ft_read_fd(t_fd *fd)
 			if (*ptr == '\n')
 				ft_push_fd(fd);
 			else
-				ft_dlist_push_back_str(&fd->block,
-									   ft_strndup(ptr, 1),
-									   NF_DESTROY_ALL);
+				PUSH_BLOCK(&fd->block, ft_strndup(ptr, 1));
 			ptr++;
 		}
 	}
@@ -113,3 +125,5 @@ int				get_next_line(int const fd, char **line)
 	}
 	return (ft_process_fd(pfd, line));
 }
+
+#undef PUSH_BLOCK
