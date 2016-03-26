@@ -6,14 +6,11 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/26 11:53:42 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/26 12:52:50 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/26 15:07:33 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <libft.h>
-#include <unistd.h>
-#include <stdio.h>
-#include "get_next_line.h"
+#include "testing.h"
 
 int			main(void)
 {

@@ -6,53 +6,32 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/26 12:57:28 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/26 13:46:08 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/26 15:10:41 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include <string.h>
-#include <stdio.h>
-#include <unistd.h>
-#include "get_next_line.h"
+
+#include "testing.h"
 
 int		main(void)
 {
-	char const		*buf[] =
-		{
-			"this is the first line of a small file",
-			"and this is the second one",
-			"",
-			"the line above should be blank as well as the",
-			"one below.",
-			NULL
-		};
-	char const		**pline;
-	char			*lnbuf;
-	int				code;
-	int				line;
-	size_t			lncap;
-	int				fd;
-	FILE			*f;
+	char	*lnbuf;
+	size_t	lncap;
+	int		line;
+	int		code;
 
-	fd = STDIN_FILENO;
-	f = fdopen(fd, "rw+");
-	pline = &buf[0];
-	printf("Input buffer (%ld)\n-------------\n", sizeof(buf) / sizeof(char const *) - 1);
-	while (*pline)
-	{
-		printf("%ld chars -\t\"%s\"\n", strlen(*pline), *pline);
-		pline++;
-	}
-	pline = &buf[0];
-	while (*pline)
-	{
-		fprintf(f, "%s\n", *pline);
-		pline++;
-	}
-	fflush(f);
+	feed_input(STDIN_FILENO);
 	lnbuf = NULL;
 	lncap = 0;
 	line = 0;
 	code = 1;
+	FILE	*f;
+
+	f = fdopen(STDIN_FILENO, "rw+");
+	if (!f)
+	{
+		perror("failed to open file!");
+		return (1);
+	}
 	while (code > 0)
 	{
 		code = getline(&lnbuf, &lncap, f);
@@ -66,3 +45,11 @@ int		main(void)
 	fclose(f);
 	return (0);
 }
+
+
+
+
+
+
+
+

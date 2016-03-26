@@ -1,31 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test_small.c                                       :+:      :+:    :+:   */
+/*   testing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/03/26 12:57:28 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/26 15:07:16 by mwelsch          ###   ########.fr       */
+/*   Created: 2016/03/26 14:59:11 by mwelsch           #+#    #+#             */
+/*   Updated: 2016/03/26 15:06:56 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "testing.h"
 
-int		main(void)
-{
-	int		line;
-	int		code;
-	char	*lnbuf;
+#ifndef		TESTING_H
+# define	TESTING_H
 
-	feed_input(STDIN_FILENO);
-	line = 0;
-	code = 1;
-	while (code > 0)
-	{
-		code = get_next_line(STDIN_FILENO, &lnbuf);
-		printf("line[%d]: \"%s\" (%ld chars)\n", line, lnbuf, strlen(lnbuf));
-		line++;
-	}
-	printf("on exit, line pointer is %p\n", lnbuf);
-	return (0);
-}
+# include <string.h>
+# include <stdio.h>
+# include <unistd.h>
+
+# include "libft.h"
+# include "get_next_line.h"
+
+void	feed_input(int fd);
+
+#endif
