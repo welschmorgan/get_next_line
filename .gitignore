@@ -1,5 +1,4 @@
 *.dSYM
 *.o
-libft/objs/*.o
 libft/*.a
-test/*.o
+test
