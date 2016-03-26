@@ -23,6 +23,7 @@ $(NAME): $(OBJS)
 	printf "\r\033[K[$(CC)|%s%%] Linked $@\n" "$$PRCT";
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@if [ ! -d "$(OBJ_DIR)" ]; then mkdir -p $(OBJ_DIR); fi
 	@PRCT=$$( echo "scale=1; $(COUNT) / $(NOBJS) * 100.0" | bc ); \
 	printf "\r\033[K[$(CC)|%s%%] Compiling %s into %s ... " "$$PRCT" "$<" "$@"; \
 	$(CC) $(CFLAGS) -c -o $@ $^; \
