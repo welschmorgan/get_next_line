@@ -1,6 +1,7 @@
 INC_DIR=includes
 SRC_DIR=units
 OBJ_DIR=objs
+LIB_DIR=../libft
 
 CFLAGS = -Wall -Wextra -Werror -I../libft/includes -I.. -I$(INC_DIR) -g
 LDFLAGS = -L../libft/ -lft
@@ -15,16 +16,21 @@ OBJS=$(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRCS))
 TESTS=$(patsubst $(SRC_DIR)/%.c,%,$(SRCS))
 NOBJS=$(shell echo $(OBJS) | wc -w)
 
-all: $(OBJS) $(OBJ_DIR)/get_next_line.o $(TESTS)
+all: $(OBJS) $(OBJ_DIR)/get_next_line.o $(LIB_DIR)/libft.a $(TESTS)
 
 test_%: $(OBJ_DIR)/get_next_line.o $(OBJ_DIR)/test_%.o
 	$(LD) -o $@ $^ $(LDFLAGS)
 
 $(OBJ_DIR)/get_next_line.o: ../get_next_line.c
+	@if [ ! -d $(OBJ_DIR) ]; then mkdir -p $(OBJ_DIR); fi
 	$(CC) -c -o $@ $^ $(CFLAGS)
 
 $(OBJ_DIR)/test_%.o: $(SRC_DIR)/test_%.c
+	@if [ ! -d $(OBJ_DIR) ]; then mkdir -p $(OBJ_DIR); fi
 	$(CC) -c -o $@ $^ $(CFLAGS)
+
+$(LIB_DIR)/libft.a:
+	make -C $(LIB_DIR)
 
 clean:
 	rm -f $(OBJS) $(OBJ_DIR)/get_next_line.o
