@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:17 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/25 13:39:20 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/26 11:42:44 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ int				ft_read_fd(t_fd *fd)
 		fd->code = READ_EOF;
 	if (fd->code == READ_ERR)
 		return (fd->code);
-	if (fd->code != READ_ERR) // == READ_OK
+	if (fd->code != READ_ERR)
 	{
 		ptr = fd->buf;
 		while (ptr < (fd->buf + fd->count) && *ptr)
@@ -58,6 +58,10 @@ int				ft_read_fd(t_fd *fd)
 	}
 	return (fd->code);
 }
+
+/*
+** == READ_OK
+*/
 
 int				ft_push_fd(t_fd *fd)
 {
@@ -92,13 +96,9 @@ int				ft_process_fd(t_fd *fd, char **line)
 	if (fd->block.tail)
 		ft_push_fd(fd);
 	fd->code = READ_OK;
-	/*if (*line)
-	  ft_strdel(line);*/
 	cur = fd->lines.tail;
 	if (cur)
 	{
-		/**line = ft_strdup((char*)cur->data);
-		 */
 		*line = cur->data;
 		cur->data = NULL;
 	}
@@ -115,6 +115,19 @@ int				ft_process_fd(t_fd *fd, char **line)
 	}
 	return (fd->code);
 }
+
+/*
+** #if defined(SMART_GET_NEXT_LINE) && SMART_GET_NEXT_LINE == 1
+**	if (*line)
+**	  ft_strdel(line);
+** #endif
+**	cur = fd->lines.tail;
+**	if (cur)
+**	{
+** #if defined(SMART_GET_NEXT_LINE) && SMART_GET_NEXT_LINE == 1
+**		*line = ft_strdup((char*)cur->data);
+** #endif
+*/
 
 int				get_next_line(int const fd, char **line)
 {
