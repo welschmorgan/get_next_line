@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/26 12:57:28 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/26 13:28:16 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/26 13:46:08 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <string.h>
@@ -26,12 +26,15 @@ int		main(void)
 			NULL
 		};
 	char const		**pline;
-	char			lnbuf[100];
+	char			*lnbuf;
 	int				code;
 	int				line;
+	size_t			lncap;
 	int				fd;
+	FILE			*f;
 
-	fd = dup(STDIN_FILENO);
+	fd = STDIN_FILENO;
+	f = fdopen(fd, "rw+");
 	pline = &buf[0];
 	printf("Input buffer (%ld)\n-------------\n", sizeof(buf) / sizeof(char const *) - 1);
 	while (*pline)
@@ -42,19 +45,24 @@ int		main(void)
 	pline = &buf[0];
 	while (*pline)
 	{
-		ft_putendl_fd(*pline, fd);
+		fprintf(f, "%s\n", *pline);
 		pline++;
 	}
-	fflush(stdin);
-	fflush(stdout);
+	fflush(f);
+	lnbuf = NULL;
+	lncap = 0;
 	line = 0;
 	code = 1;
 	while (code > 0)
 	{
-		code = read(fd, &lnbuf[0], 100);
-		printf("line[%d]: \"%s\" (%ld chars)\n", line, lnbuf, strlen(lnbuf));
+		code = getline(&lnbuf, &lncap, f);
+		if (lnbuf)
+			printf("line[%d]: \"%s\" (%ld chars)\n", line, lnbuf, strlen(lnbuf));
+		if (lnbuf)
+			ft_strdel(&lnbuf);
 		line++;
 	}
 	printf("on exit, line pointer is %p\n", lnbuf);
+	fclose(f);
 	return (0);
 }
