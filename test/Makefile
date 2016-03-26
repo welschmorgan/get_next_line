@@ -1,4 +1,8 @@
-CFLAGS = -Wall -Wextra -Werror -I../libft/includes -I.. -g
+INC_DIR=includes
+SRC_DIR=units
+OBJ_DIR=objs
+
+CFLAGS = -Wall -Wextra -Werror -I../libft/includes -I.. -I$(INC_DIR) -g
 LDFLAGS = -L../libft/ -lft
 CC = clang
 LD = clang
@@ -6,23 +10,26 @@ LD = clang
 SHELL=/bin/bash
 COUNT=0
 
-SRCS=$(shell find . -name "test_*.c" -type f)
-OBJS=$(patsubst %.c,%.o,$(SRCS))
-TESTS=$(patsubst %.c,%,$(SRCS))
+SRCS=$(shell find $(SRC_DIR) -name "test_*.c" -type f)
+OBJS=$(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRCS))
+TESTS=$(patsubst $(SRC_DIR)/%.c,%,$(SRCS))
 NOBJS=$(shell echo $(OBJS) | wc -w)
 
-build:
-	for TEST in $(TESTS); do $(CC) $(CFLAGS) -c -o $$TEST.o $$TEST.c; done
+all: $(OBJS) $(OBJ_DIR)/get_next_line.o $(TESTS)
 
-link:
-	for TEST in $(TESTS); do $(LD) -o $$TEST $$TEST.o $(LDFLAGS); done
+test_%: $(OBJ_DIR)/get_next_line.o $(OBJ_DIR)/test_%.o
+	$(LD) -o $@ $^ $(LDFLAGS)
 
-all: build link
+$(OBJ_DIR)/get_next_line.o: ../get_next_line.c
+	$(CC) -c -o $@ $^ $(CFLAGS)
+
+$(OBJ_DIR)/test_%.o: $(SRC_DIR)/test_%.c
+	$(CC) -c -o $@ $^ $(CFLAGS)
+
 clean:
-	rm -f $(OBJS)
+	rm -f $(OBJS) $(OBJ_DIR)/get_next_line.o
 fclean: clean
 	rm -f $(TESTS)
+re: fclean all
 
-re: fclean tests
-
-.PHONY: clean fclean re all build link
+.PHONY: clean fclean re all

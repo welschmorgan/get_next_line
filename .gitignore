@@ -1,4 +1,5 @@
 *.dSYM
 *.o
-test_gnl
-two_lines_of_08
+libft/objs/*.o
+libft/*.a
+test/*.o
