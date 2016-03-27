@@ -1,6 +1,15 @@
 #include "testing.h"
 #include "assert.h"
 
+void	test_line(int const fd, char **line, char const *should_be)
+{
+	int c;
+	c = get_next_line(fd, line);
+	printf("line[%d]: %s\n", c, *line);
+	assert(strcmp(*line, should_be) == 0);
+	printf("\tOK\n");
+}
+
 int main(void)
 {
 	char 	*line;
@@ -22,20 +31,13 @@ int main(void)
 	write(fd, "wxyzabcd\n", 9);
 	close(p[1]);
 	dup2(out, fd);
-	get_next_line(p[0], &line);
-	assert(strcmp(line, "abcdefgh") == 0);
-	get_next_line(p[0], &line);
-	assert(strcmp(line, "ijklmnop") == 0);
-	get_next_line(p[0], &line);
-	assert(strcmp(line, "qrstuvwx") == 0);
-	get_next_line(p[0], &line);
-	assert(strcmp(line, "yzabcdef") == 0);
-	get_next_line(p[0], &line);
-	assert(strcmp(line, "ghijklmn") == 0);
-	get_next_line(p[0], &line);
-	assert(strcmp(line, "opqrstuv") == 0);
-	get_next_line(p[0], &line);
-	assert(strcmp(line, "wxyzabcd") == 0);
+	test_line(p[0], &line, "abcdefgh");
+	test_line(p[0], &line, "ijklmnop");
+	test_line(p[0], &line, "qrstuvwx");
+	test_line(p[0], &line, "yzabcdef");
+	test_line(p[0], &line, "ghijklmn");
+	test_line(p[0], &line, "opqrstuv");
+	test_line(p[0], &line, "wxyzabcd");
 	return (0);
 }
 
