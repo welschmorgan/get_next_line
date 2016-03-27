@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:07 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/27 14:29:14 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/27 16:30:49 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 # include <stddef.h>
 # include <libft.h>
 
-# define BUFF_SIZE		5
+# define BUFF_SIZE		50
 # define FD_MAX			255
 
 # define SHOW_LAST_LINE	1
