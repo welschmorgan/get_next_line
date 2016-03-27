@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:17 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/27 13:43:32 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/27 13:47:48 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,7 +180,7 @@ int				get_next_line(int const fd, char **line)
 	if (pfd->lines.tail)
 	{
 		ret = ft_process_fd(pfd, line);
-		ft_close_fd(fds, pfd);
+		ft_close_fd(&fds, pfd);
 		return (ret);
 	}
 	else if (pfd->stop)
