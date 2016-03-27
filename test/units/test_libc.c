@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/26 12:57:28 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/26 15:10:41 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/27 12:23:00 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,15 +41,9 @@ int		main(void)
 			ft_strdel(&lnbuf);
 		line++;
 	}
+	if (lnbuf)
+		ft_strdel(&lnbuf);
 	printf("on exit, line pointer is %p\n", lnbuf);
 	fclose(f);
 	return (0);
 }
-
-
-
-
-
-
-
-

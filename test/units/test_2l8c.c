@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/26 11:53:42 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/26 15:07:33 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/27 12:24:27 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,13 @@ int			main(void)
 	printf("write[0]: returned %d / %ld\n", w1, l1);
 	printf("write[1]: returned %d / %ld\n", w2, l2);
 	get_next_line(fd, &buf);
+	if (buf)
+		ft_strdel(&buf);
 	c1 = ft_strncmp(buf, s1, l1 - 1);
 	printf("line[0]: %s - compare: %s\n", buf, !c1 ? "OK" : "FAIL");
 	get_next_line(fd, &buf);
+	if (buf)
+		ft_strdel(&buf);
 	c2 = ft_strncmp(buf, s2, l2 - 1);
 	printf("line[1]: %s - compare: %s\n", buf, !c2 ? "OK" : "FAIL");
 	close(fd);
