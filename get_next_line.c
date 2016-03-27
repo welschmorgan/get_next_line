@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:17 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/26 11:42:44 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/27 13:19:26 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,29 @@
 
 #define PUSH_BLOCK(LST, DATA) ft_dlist_push_back_str(LST, DATA, NF_DESTROY_ALL)
 
-t_fd			*ft_init_fd(t_fd *fd, int const fdi)
+t_fd			*ft_init_fd(t_dlist *fds, int const fdi)
 {
-	if (!fd || fd->init)
+	t_dnode		*cur;
+	t_fd		*fd;
+
+	fd = NULL;
+	cur = fds->tail;
+	while (cur)
+	{
+		fd = (t_fd*)cur->data;
+		if (fd && fd->fd == fdi)
+			break ;
+		cur = cur->next;
+	}
+	if (!fd)
+	{
+		cur = ft_dnode_new(ft_memalloc(sizeof(t_fd)),
+						   sizeof(t_fd),
+						   NF_DESTROY_ALL);
+		ft_dlist_add_back(fds, cur);
+		fd = (t_fd*)cur->data;
+	}
+	if (fd->init)
 		return (fd);
 	fd->fd = fdi;
 	fd->init = TRUE;
@@ -131,14 +151,13 @@ int				ft_process_fd(t_fd *fd, char **line)
 
 int				get_next_line(int const fd, char **line)
 {
-	static t_fd	fds[FD_MAX];
-	t_fd		*pfd;
+	static t_dlist	fds;
+	t_fd			*pfd;
 
-	if (fd < 0 || fd >= FD_MAX || !line)
+	if (fd < 0 || !line)
 		return (READ_ERR);
 	*line = NULL;
-	pfd = &fds[fd];
-	ft_init_fd(pfd, fd);
+	pfd = ft_init_fd(&fds, fd);
 	if (pfd->lines.tail)
 		return (ft_process_fd(pfd, line));
 	else if (pfd->stop)
@@ -153,3 +172,9 @@ int				get_next_line(int const fd, char **line)
 }
 
 #undef PUSH_BLOCK
+
+
+
+
+
+
