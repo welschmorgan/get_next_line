@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:17 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/27 13:47:48 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/27 13:59:31 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@ void			ft_close_fd(t_dlist *fds, t_fd *fd)
 	ft_dlist_remove(fds, &cur, ft_dlist_deleter);
 }
 
-int				ft_process_fd(t_fd *fd, char **line)
+int				ft_process_fd(t_dlist *fds, t_fd *fd, char **line)
 {
 	t_dnode		*cur;
 
@@ -147,6 +147,9 @@ int				ft_process_fd(t_fd *fd, char **line)
 	{
 		ft_dlist_clear(&fd->lines, ft_dlist_deleter);
 		ft_dlist_clear(&fd->block, ft_dlist_deleter);
+		cur = ft_dlist_find(fds, (void const *)fd);
+		if (cur)
+			ft_dlist_remove(fds, &cur, ft_dlist_deleter);
 		fd->stop = TRUE;
 		fd->code = READ_EOF;
 		return (READ_OK);
