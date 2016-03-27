@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:17 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/27 13:19:26 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/27 13:43:32 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,24 @@ int				ft_push_fd(t_fd *fd)
 	return (fd->code);
 }
 
+void			ft_close_fd(t_dlist *fds, t_fd *fd)
+{
+	t_dnode		*cur;
+
+	if (!fd || !fds)
+		return ;
+	cur = fds->tail;
+	while (cur)
+	{
+		if (fd == (t_fd*)cur->data)
+			break ;
+		cur = cur->next;
+	}
+	if (!cur)
+		return ;
+	ft_dlist_remove(fds, &cur, ft_dlist_deleter);
+}
+
 int				ft_process_fd(t_fd *fd, char **line)
 {
 	t_dnode		*cur;
@@ -153,13 +171,18 @@ int				get_next_line(int const fd, char **line)
 {
 	static t_dlist	fds;
 	t_fd			*pfd;
+	int				ret;
 
 	if (fd < 0 || !line)
 		return (READ_ERR);
 	*line = NULL;
 	pfd = ft_init_fd(&fds, fd);
 	if (pfd->lines.tail)
-		return (ft_process_fd(pfd, line));
+	{
+		ret = ft_process_fd(pfd, line);
+		ft_close_fd(fds, pfd);
+		return (ret);
+	}
 	else if (pfd->stop)
 		return (pfd->code);
 	while (pfd->code == READ_OK)
