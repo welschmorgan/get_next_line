@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/26 12:57:28 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/27 12:23:21 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/27 13:46:54 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "testing.h"
@@ -30,6 +30,6 @@ int		main(void)
 	}
 	if (lnbuf)
 		ft_strdel(&lnbuf);
-	printf("on exit, line pointer is %p\n", lnbuf);
+	printf("on exit, line pointer is %p\n", lnbuf ? lnbuf : (char*)NULL);
 	return (0);
 }
