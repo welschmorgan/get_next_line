@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:17 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/27 14:42:59 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/27 16:07:43 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include <unistd.h>
 
 #define PUSH_BLOCK(LST, DATA) ft_dlist_push_back_str(LST, DATA, NF_DESTROY_ALL)
-
+#define PUSH_FD(LST) ft_dlist_push_back(LST, ft_dnode_new())
 t_fd			*ft_init_fd(t_dlist *fds, int const fdi)
 {
 	t_dnode		*cur;
@@ -24,17 +24,14 @@ t_fd			*ft_init_fd(t_dlist *fds, int const fdi)
 	cur = fds->tail;
 	while (cur)
 	{
-		fd = (t_fd*)cur->data;
-		if (fd && fd->fd == fdi)
+		if ((fd = (t_fd*)cur->data) && fd->fd == fdi)
 			break ;
 		cur = cur->next;
 	}
 	if (!fd)
 	{
-		cur = ft_dnode_new(ft_memalloc(sizeof(t_fd)),
-						   sizeof(t_fd),
-						   NF_DESTROY_ALL);
-		ft_dlist_add_back(fds, cur);
+		ft_dlist_add_back(fds, ft_dnode_new(ft_memalloc(sizeof(t_fd)),
+											sizeof(t_fd), NF_DESTROY_ALL));
 		fd = (t_fd*)cur->data;
 		fd->init = FALSE;
 	}
@@ -124,7 +121,10 @@ int				ft_process_fd(t_dlist *fds, t_fd *fd, char **line)
 		ft_dlist_clear(&fd->block, ft_dlist_deleter);
 		cur = ft_dlist_find(fds, (void const *)fd);
 		if (cur)
+		{
+			ft_bzero(cur->data, sizeof(t_fd));
 			ft_dlist_remove(fds, &cur, ft_dlist_deleter);
+		}
 		return (READ_EOF);
 	}
 	fd->code = READ_OK;
@@ -166,7 +166,7 @@ int				get_next_line(int const fd, char **line)
 		return (ft_process_fd(&fds, pfd, line));
 	else if (pfd->stop)
 		return (pfd->code);
-	while (pfd->code == READ_OK)
+	while (pfd->code > READ_EOF)
 		ft_read_fd(pfd);
 	return (ft_process_fd(&fds, pfd, line));
 }
