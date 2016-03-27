@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:17 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/27 14:22:00 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/27 14:30:41 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ t_fd			*ft_init_fd(t_dlist *fds, int const fdi)
 						   NF_DESTROY_ALL);
 		ft_dlist_add_back(fds, cur);
 		fd = (t_fd*)cur->data;
+		fd->init = FALSE;
 	}
 	if (fd->init)
 		return (fd);
@@ -107,24 +108,6 @@ int				ft_push_fd(t_fd *fd)
 	return (fd->code);
 }
 
-void			ft_close_fd(t_dlist *fds, t_fd *fd)
-{
-	t_dnode		*cur;
-
-	if (!fd || !fds)
-		return ;
-	cur = fds->tail;
-	while (cur)
-	{
-		if (fd == (t_fd*)cur->data)
-			break ;
-		cur = cur->next;
-	}
-	if (!cur)
-		return ;
-	ft_dlist_remove(fds, &cur, ft_dlist_deleter);
-}
-
 int				ft_process_fd(t_dlist *fds, t_fd *fd, char **line)
 {
 	t_dnode		*cur;
@@ -133,6 +116,17 @@ int				ft_process_fd(t_dlist *fds, t_fd *fd, char **line)
 		return (fd->code);
 	if (fd->block.tail)
 		ft_push_fd(fd);
+	if (!fd->lines.tail)
+	{
+		fd->stop = TRUE;
+		fd->code = READ_EOF;
+		ft_dlist_clear(&fd->lines, ft_dlist_deleter);
+		ft_dlist_clear(&fd->block, ft_dlist_deleter);
+		cur = ft_dlist_find(fds, (void const *)fd);
+		if (cur)
+			ft_dlist_remove(fds, &cur, ft_dlist_deleter);
+		return (READ_EOF);
+	}
 	fd->code = READ_OK;
 	cur = fd->lines.tail;
 	if (cur)
@@ -143,17 +137,6 @@ int				ft_process_fd(t_dlist *fds, t_fd *fd, char **line)
 	ft_dlist_remove(&fd->lines,
 					&cur,
 					ft_dlist_deleter);
-	if (!fd->lines.tail)
-	{
-		ft_dlist_clear(&fd->lines, ft_dlist_deleter);
-		ft_dlist_clear(&fd->block, ft_dlist_deleter);
-		fd->stop = TRUE;
-		fd->code = READ_EOF;
-		cur = ft_dlist_find(fds, (void const *)fd);
-		if (cur)
-			ft_dlist_remove(fds, &cur, ft_dlist_deleter);
-		return (READ_OK);
-	}
 	return (fd->code);
 }
 
@@ -183,7 +166,7 @@ int				get_next_line(int const fd, char **line)
 		return (ft_process_fd(&fds, pfd, line));
 	else if (pfd->stop)
 		return (pfd->code);
-	while (pfd->code == READ_OK)
+	while (pfd->code > 0)
 	{
 		ft_read_fd(pfd);
 		if (pfd->code != READ_OK)
