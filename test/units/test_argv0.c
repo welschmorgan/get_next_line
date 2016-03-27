@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/26 12:57:28 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/27 14:19:48 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/27 14:51:32 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ static int	pass(char const *name, int (*pfn)(char **buf), char **lnbuf)
 	while (code > 0)
 	{
 		code = pfn(lnbuf);
-		printf("%s - line[%d]: \"%s\" (%ld chars)\n", name, line, *lnbuf ? *lnbuf : "NULL", *lnbuf ? strlen(*lnbuf) : 0);
+		printf("%s - line[%d ret:%d]: \"%s\" (%ld chars)\n", name, line, code, *lnbuf ? *lnbuf : "NULL", *lnbuf ? strlen(*lnbuf) : 0);
 		if (*lnbuf)
 			ft_strdel(lnbuf);
 		line++;
