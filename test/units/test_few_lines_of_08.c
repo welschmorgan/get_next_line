@@ -38,6 +38,9 @@ int main(void)
 	test_line(p[0], &line, "ghijklmn");
 	test_line(p[0], &line, "opqrstuv");
 	test_line(p[0], &line, "wxyzabcd");
+	close(fd);
+	close(out);
+	close(p[0]);
 	return (0);
 }
 

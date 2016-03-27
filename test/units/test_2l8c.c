@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/26 11:53:42 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/27 15:53:04 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/27 16:18:43 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,9 @@ int			main(void)
 	printf("line[1]: %s - compare: %s\n", buf, !c2 ? "OK" : "FAIL");
 	if (buf)
 		ft_strdel(&buf);
+	close(fd);
+	close(out);
+	close(p[0]);
 	close(fd);
 	return (0);
 }
