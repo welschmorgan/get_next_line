@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/19 11:26:49 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/26 14:02:48 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/27 13:58:48 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -300,6 +300,7 @@ t_dnode						*ft_dlist_push_front_str(t_dlist *lst,
 													char const *str,
 													unsigned int flags);
 
+t_dnode						*ft_dlist_find(t_dlist *lst, void const *data);
 void						ft_dlist_clear(t_dlist *list,
 										t_dnode_deleter deleter);
 

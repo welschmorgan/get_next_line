@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:07 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/27 13:40:50 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/27 14:00:57 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ typedef struct	s_fd
 
 t_fd			*ft_init_fd(t_dlist *fds, int const fdi);
 int				ft_push_fd(t_fd *fd);
-int				ft_process_fd(t_fd *fd, char **line);
+int				ft_process_fd(t_dlist *fds, t_fd *fd, char **line);
 int				ft_read_fd(t_fd *fd);
 t_fd			*ft_reset_fd(t_fd *fd);
 void			ft_close_fd(t_dlist *fds, t_fd *fd);
