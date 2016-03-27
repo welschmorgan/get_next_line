@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:17 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/27 16:10:24 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/27 17:00:40 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include <unistd.h>
 
 #define PUSH_BLOCK(LST, DATA) ft_dlist_push_back_str(LST, DATA, NF_DESTROY_ALL)
-#define PUSH_FD(LST) ft_dlist_push_back(LST, ft_dnode_new())
+
 t_fd			*ft_init_fd(t_dlist *fds, int const fdi)
 {
 	t_dnode		*cur;
