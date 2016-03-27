@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:17 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/27 17:00:40 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/27 18:04:50 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,7 @@ int				ft_process_fd(t_dlist *fds, t_fd *fd, char **line)
 		return (fd->code);
 	if (fd->block.tail)
 		ft_push_fd(fd);
+	*line = NULL;
 	if (!fd->lines.tail)
 	{
 		fd->stop = TRUE;
@@ -161,7 +162,6 @@ int				get_next_line(int const fd, char **line)
 
 	if (fd < 0 || !line)
 		return (READ_ERR);
-	*line = NULL;
 	pfd = ft_init_fd(&fds, fd);
 	if (pfd->lines.tail)
 		return (ft_process_fd(&fds, pfd, line));
@@ -173,9 +173,3 @@ int				get_next_line(int const fd, char **line)
 }
 
 #undef PUSH_BLOCK
-
-
-
-
-
-

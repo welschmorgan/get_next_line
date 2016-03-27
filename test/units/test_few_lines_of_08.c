@@ -6,7 +6,8 @@ void	test_line(int const fd, char **line, char const *should_be)
 	int c;
 	c = get_next_line(fd, line);
 	printf("line[%d]: %s\n", c, *line);
-	assert(strcmp(*line, should_be) == 0);
+	if (*line)
+		assert(strcmp(*line, should_be) == 0);
 	printf("\tOK\n");
 }
 
@@ -38,6 +39,7 @@ int main(void)
 	test_line(p[0], &line, "ghijklmn");
 	test_line(p[0], &line, "opqrstuv");
 	test_line(p[0], &line, "wxyzabcd");
+	test_line(p[0], &line, "");
 	close(fd);
 	close(out);
 	close(p[0]);
