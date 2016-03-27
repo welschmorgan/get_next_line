@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/26 12:57:28 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/27 12:44:02 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/27 14:19:48 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 
-static FILE	*g_file = NULL;
+//static FILE	*g_file = NULL;
 static int	g_fd = -1;
 
 static int	read_ft(char **buf)
@@ -22,12 +22,12 @@ static int	read_ft(char **buf)
 	return (get_next_line(g_fd, buf));
 }
 
-static int	read_libc(char **buf)
+/*static int	read_libc(char **buf)
 {
 	static size_t	size = 0;
 	return (getline(buf, &size, g_file));
 }
-
+*/
 static int	pass(char const *name, int (*pfn)(char **buf), char **lnbuf)
 {
 	int		line;
@@ -53,7 +53,7 @@ static int	pass(char const *name, int (*pfn)(char **buf), char **lnbuf)
 int		main(int argc, char *argv[])
 {
 	int		ft_ret;
-	int		libc_ret;
+	//int		libc_ret;
 	char	*line;
 
 	if (argc != 2)
@@ -63,7 +63,7 @@ int		main(int argc, char *argv[])
 		return (2);
 	ft_ret = pass("libft", read_ft, &line);
 	close(g_fd);
-	g_file = fdopen(g_fd, "r");
+	/*g_file = fdopen(g_fd, "r");
 	libc_ret = pass("libc", read_libc, &line);
-	fclose(g_file);
+	fclose(g_file);*/
 }
