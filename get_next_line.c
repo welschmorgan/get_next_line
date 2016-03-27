@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:17 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/27 16:07:43 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/27 16:10:24 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,9 @@ t_fd			*ft_init_fd(t_dlist *fds, int const fdi)
 	}
 	if (!fd)
 	{
-		ft_dlist_add_back(fds, ft_dnode_new(ft_memalloc(sizeof(t_fd)),
-											sizeof(t_fd), NF_DESTROY_ALL));
+		ft_dlist_add_back(fds, (cur = ft_dnode_new(ft_memalloc(sizeof(t_fd)),
+												   sizeof(t_fd),
+												   NF_DESTROY_ALL)));
 		fd = (t_fd*)cur->data;
 		fd->init = FALSE;
 	}
