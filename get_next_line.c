@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:17 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/27 14:01:41 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/27 14:03:07 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,7 +174,6 @@ int				get_next_line(int const fd, char **line)
 {
 	static t_dlist	fds;
 	t_fd			*pfd;
-	int				ret;
 
 	if (fd < 0 || !line)
 		return (READ_ERR);
