@@ -6,15 +6,14 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:17 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/27 16:10:24 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/28 11:47:37 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+#include <stdio.h>
 #include <unistd.h>
 
-#define PUSH_BLOCK(LST, DATA) ft_dlist_push_back_str(LST, DATA, NF_DESTROY_ALL)
-#define PUSH_FD(LST) ft_dlist_push_back(LST, ft_dnode_new())
 t_fd			*ft_init_fd(t_dlist *fds, int const fdi)
 {
 	t_dnode		*cur;
@@ -42,117 +41,81 @@ t_fd			*ft_init_fd(t_dlist *fds, int const fdi)
 	fd->init = TRUE;
 	fd->code = READ_OK;
 	fd->count = 0;
-	fd->stop = FALSE;
 	ft_bzero(fd->buf, BUFF_SIZE);
-	ft_dlist_init(&fd->block);
 	ft_dlist_init(&fd->lines);
 	return (fd);
 }
 
 int				ft_read_fd(t_fd *fd)
 {
-	char		*ptr;
-
 	ft_bzero(fd->buf, BUFF_SIZE);
 	fd->count = read(fd->fd, fd->buf, BUFF_SIZE);
-	if (fd->count > 0)
-		fd->code = READ_OK;
-	else if (fd->count < 0)
+	if (fd->count < 0)
 		fd->code = READ_ERR;
-	else
+	else if (!fd->count)
 		fd->code = READ_EOF;
-	if (fd->code == READ_ERR)
-		return (fd->code);
-	if (fd->code != READ_ERR)
-	{
-		ptr = fd->buf;
-		while (ptr < (fd->buf + fd->count) && *ptr)
-		{
-			if (*ptr == '\n')
-				ft_push_fd(fd);
-			else
-				PUSH_BLOCK(&fd->block, ft_strndup(ptr, 1));
-			ptr++;
-		}
-	}
+	else if (fd->count > 0)
+		fd->code = READ_OK;
 	return (fd->code);
 }
-
-/*
-** == READ_OK
-*/
 
 int				ft_push_fd(t_fd *fd)
 {
-	t_dnode		*cur;
-	char		*pdata;
-	char		*buf;
-	char		*pbuf;
+	char		*pend;
+	char		*pstart;
+	char		*pcur;
+	char		*pdup;
 
-	buf = ft_strnew(fd->block.size);
-	pbuf = buf;
-	cur = fd->block.tail;
-	while (cur)
+	pstart = fd->buf;
+	pend = fd->buf + fd->count;
+	pcur = pstart;
+	while ((pcur = ft_strchr(pstart, '\n')) && pcur < pend)
 	{
-		pdata = (char*)cur->data;
-		if (pdata)
-			*pbuf = *pdata;
-		pbuf++;
-		cur = cur->next;
+		*pcur = 0;
+		pdup = ft_strdup(pstart);
+		printf("block: \"%s\"\n", pdup);
+		ft_dlist_add_front_str(&fd->lines, pdup, NF_DESTROY_ALL);
+		pstart = pcur + 1;
 	}
-	*pbuf = '\0';
-	ft_dlist_clear(&fd->block, ft_dlist_deleter);
-	ft_dlist_push_back_str(&fd->lines, buf, NF_DESTROY_ALL);
+	if (pstart < pend)
+	{
+		pdup = ft_strdup(pstart);
+		printf("block: \"%s\"\n", pdup);
+		ft_dlist_add_front_str(&fd->lines, pdup, NF_DESTROY_ALL);
+	}
+	ft_bzero(fd->buf, BUFF_SIZE);
 	return (fd->code);
 }
+
+# define FD_OK(fd) (fd->code >= READ_OK)
+# define FD_EOF(fd) (fd->code == READ_EOF)
+# define FD_ERR(fd) (fd->code <= READ_ERR)
+
+# define FD_NODE(fds, fd)	ft_dlist_find(fds, (void const *)fd)
+
+# define FD_HAS_LINE(fd) (fd->lines.tail != NULL)
+# define FD_CLEAR_LINES(fd) ft_dlist_clear(&fd->lines, ft_dlist_deleter)
+# define FD_PROCESS(fds, fd, l) ft_process_fd(fds, fd, l)
 
 int				ft_process_fd(t_dlist *fds, t_fd *fd, char **line)
 {
 	t_dnode		*cur;
 
-	if (fd->code == READ_ERR)
-		return (fd->code);
-	if (fd->block.tail)
-		ft_push_fd(fd);
-	if (!fd->lines.tail)
+	fd->code = READ_OK;
+	if (!FD_HAS_LINE(fd))
 	{
-		fd->stop = TRUE;
-		fd->code = READ_EOF;
-		ft_dlist_clear(&fd->lines, ft_dlist_deleter);
-		ft_dlist_clear(&fd->block, ft_dlist_deleter);
-		cur = ft_dlist_find(fds, (void const *)fd);
-		if (cur)
-		{
-			ft_bzero(cur->data, sizeof(t_fd));
+		FD_CLEAR_LINES(fd);
+		if ((cur = FD_NODE(fds, fd)))
 			ft_dlist_remove(fds, &cur, ft_dlist_deleter);
-		}
 		return (READ_EOF);
 	}
-	fd->code = READ_OK;
 	cur = fd->lines.tail;
-	if (cur)
-	{
-		*line = cur->data;
-		cur->data = NULL;
-	}
-	ft_dlist_remove(&fd->lines,
-					&cur,
-					ft_dlist_deleter);
+	*line = cur->data;
+	cur->data = NULL;
+	printf("process: %s\n", line ? *line : "NULL");
+	ft_dlist_remove(&fd->lines, &cur, ft_dlist_deleter);
 	return (fd->code);
 }
-
-/*
-** #if defined(SMART_GET_NEXT_LINE) && SMART_GET_NEXT_LINE == 1
-**	if (*line)
-**	  ft_strdel(line);
-** #endif
-**	cur = fd->lines.tail;
-**	if (cur)
-**	{
-** #if defined(SMART_GET_NEXT_LINE) && SMART_GET_NEXT_LINE == 1
-**		*line = ft_strdup((char*)cur->data);
-** #endif
-*/
 
 int				get_next_line(int const fd, char **line)
 {
@@ -161,21 +124,13 @@ int				get_next_line(int const fd, char **line)
 
 	if (fd < 0 || !line)
 		return (READ_ERR);
-	*line = NULL;
 	pfd = ft_init_fd(&fds, fd);
-	if (pfd->lines.tail)
-		return (ft_process_fd(&fds, pfd, line));
-	else if (pfd->stop)
-		return (pfd->code);
-	while (pfd->code > READ_EOF)
-		ft_read_fd(pfd);
-	return (ft_process_fd(&fds, pfd, line));
+	if (!FD_HAS_LINE(pfd))
+	{
+		while (ft_read_fd(pfd) == READ_OK)
+			ft_push_fd(pfd);
+	}
+	return (FD_PROCESS(&fds, pfd, line));
 }
 
 #undef PUSH_BLOCK
-
-
-
-
-
-

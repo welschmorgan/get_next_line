@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:07 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/27 16:30:49 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/28 10:37:52 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,8 @@ typedef struct	s_fd
 	int			fd;
 	int			init;
 	int			code;
-	int			stop;
 	int			count;
 	char		buf[BUFF_SIZE];
-	t_dlist		block;
 	t_dlist		lines;
 }				t_fd;
 

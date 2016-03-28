@@ -6,7 +6,7 @@
 /*   By: mwelsch <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/09 12:51:31 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/24 16:10:09 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/28 13:22:00 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,11 @@ t_dnode				*ft_dlist_insert_first(t_dlist *list, t_dnode *node)
 {
 	if (list && node)
 	{
+		node->parent = list;
+		node->next = NULL;
+		node->prev = NULL;
 		list->tail = node;
-		list->head = NULL;
-		list->tail->next = list->head;
-		list->tail->prev = NULL;
+		list->head = list->tail;
 		list->size = 1;
 	}
 	return (node);
@@ -28,22 +29,22 @@ t_dnode				*ft_dlist_insert_first(t_dlist *list, t_dnode *node)
 t_dnode				*ft_dlist_insert_after(t_dlist *list, t_dnode *new_node,
 										t_dnode *prev)
 {
+	t_dnode			*next;
+
 	if (!new_node || !list)
 		return (new_node);
+	if (!list->tail)
+		return (ft_dlist_insert_first(list, new_node));
 	if (!prev)
 		prev = list->head;
-	new_node->prev = NULL;
-	new_node->next = NULL;
+	next = prev->next;
 	new_node->parent = list;
 	new_node->prev = prev;
-	new_node->next = prev ? prev->next : NULL;
-	if (prev)
-		prev->next = new_node;
-	if (new_node->next)
-		new_node->next->prev = new_node->prev;
-	if (!list->tail)
-		list->tail = new_node;
-	if (!new_node->next)
+	new_node->next = next;
+	prev->next = new_node;
+	if (next)
+		next->prev = new_node;
+	if (prev == list->head)
 		list->head = new_node;
 	list->size++;
 	return (new_node);
@@ -53,23 +54,23 @@ t_dnode				*ft_dlist_insert_before(t_dlist *list,
 											t_dnode *new_node,
 											t_dnode *next)
 {
+	t_dnode			*prev;
+
 	if (!new_node || !list)
 		return (new_node);
+	if (!list->tail)
+		return (ft_dlist_insert_first(list, new_node));
 	if (!next)
 		next = list->tail;
-	new_node->prev = NULL;
-	new_node->next = NULL;
+	prev = next->prev;
 	new_node->parent = list;
-	new_node->prev = next ? next->prev : NULL;
+	new_node->prev = prev;
 	new_node->next = next;
-	if (next)
-		next->prev = new_node;
-	if (new_node->prev)
-		new_node->prev->next = new_node;
-	if (!list->tail)
+	next->prev = new_node;
+	if (prev)
+		prev->next = new_node;
+	if (next == list->tail)
 		list->tail = new_node;
-	if (!new_node->next)
-		list->head = new_node;
 	list->size++;
 	return (new_node);
 }
