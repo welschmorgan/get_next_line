@@ -6,7 +6,7 @@
 /*   By: mwelsch <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/09 12:50:46 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/29 11:58:51 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/29 12:31:37 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,18 +18,21 @@ t_dnode				*ft_dlist_extract(t_dlist *list,
 {
 	if (!list || !node || !list->size)
 		return (node);
-	printf("* extract node %p - data:%p (prev:%p next:%p tail:%p head:%p)\n", node, node->data, node->prev, node->next, list->tail, list->head);
 	if (list->tail == node && list->head != node)
 	{
 		list->tail = list->tail->next;
 		if (list->tail)
 			list->tail->prev = NULL;
+		else
+			list->tail = list->head;
 	}
 	else if (list->head == node && list->tail != node)
 	{
 		list->head = list->head->prev;
 		if (list->head)
 			list->head->next = NULL;
+		else
+			list->head = list->tail;
 	}
 	else if (list->head == node && list->tail == node)
 		list->tail = list->head = NULL;
@@ -45,7 +48,6 @@ t_dnode				*ft_dlist_extract(t_dlist *list,
 	node->parent = NULL;
 	node->prev = NULL;
 	node->next = NULL;
-	printf("\tdata:%p prev:%p next:%p tail:%p head:%p\n", node->data, node->prev, node->next, list->tail, list->head);
 	return (node);
 }
 

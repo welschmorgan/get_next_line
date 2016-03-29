@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:17 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/28 11:47:37 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/29 13:41:05 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,14 +106,14 @@ int				ft_process_fd(t_dlist *fds, t_fd *fd, char **line)
 	{
 		FD_CLEAR_LINES(fd);
 		if ((cur = FD_NODE(fds, fd)))
-			ft_dlist_remove(fds, &cur, ft_dlist_deleter);
+			ft_dlist_remove(fds, cur, ft_dlist_deleter);
 		return (READ_EOF);
 	}
 	cur = fd->lines.tail;
 	*line = cur->data;
 	cur->data = NULL;
 	printf("process: %s\n", line ? *line : "NULL");
-	ft_dlist_remove(&fd->lines, &cur, ft_dlist_deleter);
+	ft_dlist_remove(&fd->lines, cur, ft_dlist_deleter);
 	return (fd->code);
 }
 

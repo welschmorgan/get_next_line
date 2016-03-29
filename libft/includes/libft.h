@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/19 11:26:49 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/27 13:58:48 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/29 13:33:43 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -257,7 +257,7 @@ t_dlist						*ft_dlist_copy(t_dlist *dest,
 t_dlist						*ft_dlist_init(t_dlist *list);
 t_dlist						*ft_dlist_new();
 void						ft_dlist_remove(t_dlist *list,
-											t_dnode **node,
+											t_dnode *node,
 											t_dnode_deleter deleter);
 
 t_bool						ft_dlist_empty(t_dlist *list);
