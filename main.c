@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/28 09:20:18 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/28 12:55:56 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/29 12:00:07 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,45 +16,63 @@
 # include <fcntl.h>
 # include <stdio.h>
 
-void	print_dlist(t_dlist *lst)
+void	print_dlist(t_dlist *lst, int rev)
 {
 	t_dnode	*cur;
 	int		n;
 
-	cur = lst->tail;
-	n = 0;
-	printf("* list content, %ld elems (tail:%p head:%p):\n", lst->size, lst->tail, lst->head);
+	if (!lst)
+		return ;
+	cur = rev ? lst->head : lst->tail;
+	n = rev ? lst->size : 0;
+	printf("* %slist content, %ld elems (tail:%p head:%p):\n",
+		   (rev ? "reverse " : ""),
+		   lst->size,
+		   lst->tail, lst->head);
 	while (cur)
 	{
-		printf("\tnode[%d - %p]: %d (prev:%p next:%p)\n", n, cur, *(int*)cur->data, cur->prev, cur->next);
-		cur = cur->next;
-		n++;
+		printf("\tnode[%d - %p]: %d (prev:%p next:%p)\n", n, cur,
+			   cur->data ? *(int*)cur->data : -1, cur->prev, cur->next);
+		if (cur == (rev ? lst->tail : lst->head))
+			break ;
+		cur = rev ? cur->prev : cur->next;
+		n = rev ? (n ? (n - 1) : 0) : (n + 1);
 	}
 
 }
+
+int		test_dlist_push(t_dlist *lst, unsigned n, int val)
+{
+	static int	var = 42;
+
+	printf("* adding 3 int(s) = %d\n", val);
+	while (n--)
+		ft_dlist_add_back(lst, ft_dnode_new(&var, sizeof(int), NF_DESTROY_NODE));
+	print_dlist(lst, 0);
+	return (0);
+}
+
+int		test_dlist_destroy(t_dlist *list, t_dnode **n)
+{
+	if (!(n && *n))
+		return (1);
+	printf("* destroying %p (%s)\n", *n, *n == list->tail ? "tail" : (*n == list->head ? "head" : "node"));
+	ft_dlist_remove(list, n, ft_dlist_deleter);
+	print_dlist(list, 0);
+	return (0);
+}
+
 int		test_dlist()
 {
 	t_dlist	lst;
-	int		var = 42;
 
 	printf("* initializing dlist\n");
 	ft_dlist_init(&lst);
-
-	printf("* adding 3 int(s) = 42\n");
-	ft_dlist_add_back(&lst, ft_dnode_new(&var, sizeof(int), NF_DESTROY_NODE));
-	ft_dlist_add_back(&lst, ft_dnode_new(&var, sizeof(int), NF_DESTROY_NODE));
-	ft_dlist_add_back(&lst, ft_dnode_new(&var, sizeof(int), NF_DESTROY_NODE));
-	print_dlist(&lst);
-	printf("* destroy tail\n");
-	ft_dlist_remove(&lst, &lst.tail, ft_dlist_deleter);
-	print_dlist(&lst);
-	printf("* destroy head\n");
-	ft_dlist_remove(&lst, &lst.head, ft_dlist_deleter);
-	print_dlist(&lst);
-	printf("* destroy head\n");
-	ft_dlist_remove(&lst, &lst.tail, ft_dlist_deleter);
-	print_dlist(&lst);
-
+	test_dlist_push(&lst, 4, 42);
+	test_dlist_destroy(&lst, &lst.tail);
+	test_dlist_destroy(&lst, &lst.head);
+	test_dlist_destroy(&lst, &lst.tail);
+	print_dlist(&lst, 0);
 	ft_dlist_clear(&lst, ft_dlist_deleter);
 	return (0);
 }
