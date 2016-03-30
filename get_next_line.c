@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:17 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/29 13:41:05 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/30 12:15:49 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ int				ft_push_fd(t_fd *fd)
 	{
 		pdup = ft_strdup(pstart);
 		printf("block: \"%s\"\n", pdup);
-		ft_dlist_add_front_str(&fd->lines, pdup, NF_DESTROY_ALL);
+		ft_dlist_add_back_str(&fd->lines, pdup, NF_DESTROY_ALL);
 	}
 	ft_bzero(fd->buf, BUFF_SIZE);
 	return (fd->code);

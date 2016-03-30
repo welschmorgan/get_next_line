@@ -6,7 +6,7 @@
 #    By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2016/03/28 09:14:15 by mwelsch           #+#    #+#              #
-#    Updated: 2016/03/29 10:34:06 by mwelsch          ###   ########.fr        #
+#    Updated: 2016/03/30 11:24:50 by mwelsch          ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -17,16 +17,19 @@ LOBJS = $(patsubst libft/srcs/%.c,libft/objs/%.o,$(shell find libft/srcs -maxdep
 CFLAGS=-Wall -Werror -Wextra -g
 LDFLAGS=-Llibft/ -lft
 
-all: $(NAME)
+all: lib $(NAME)
 
-$(NAME): $(OBJS) libft/libft.a
-	clang -o $@ $^ #$(LDFLAGS)
+$(NAME): $(OBJS)
+	clang -o $@ $^ $(LDFLAGS)
 
 libft/libft.a: $(LOBJS)
 	@make libft.a --no-print-directory -C libft
 
 %.o: %.c
 	clang $(CFLAGS) -c -o $@ $^ -I. -Ilibft/includes
+
+lib:
+	@make libft.a -C libft
 
 clean:
 	rm -f $(OBJS)
@@ -36,4 +39,4 @@ fclean: clean
 
 re: fclean $(NAME)
 
-.PHONY: clean fclean re all
+.PHONY: clean fclean re all lib
