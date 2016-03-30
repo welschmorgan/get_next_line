@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/30 12:17:08 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/30 14:58:12 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/30 15:33:18 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # include <time.h>
 
 t_dlist	g_list;
+t_test	tests[DLIST_COUNT];
 
 void	print_dlist(t_dlist *lst, int rev)
 {
@@ -155,13 +156,12 @@ int		test_dlist_delrand5(t_test *test)
 	return (0);
 }
 
-int		main(void)
+int		init(void)
 {
-	t_test	tests[DLIST_COUNT];
-	int		code;
+	int	code;
 
-	srand(time(NULL));
 	code = 0;
+	srand(time(NULL));
 	printf("* initializing dlist\n");
 	ft_dlist_init(&g_list);
 	init_test(&tests[DLIST_ADD5], "add 5 at back", test_dlist_add5);
@@ -169,6 +169,20 @@ int		main(void)
 	init_test(&tests[DLIST_DELHEAD5], "delete 5 at head", test_dlist_delhead5);
 	init_test(&tests[DLIST_CLEAR], "clear all", test_dlist_clear);
 	init_test(&tests[DLIST_DELRAND5], "delete 5 randomly", test_dlist_delrand5);
+	return (code);
+}
+
+int		reset(void)
+{
+	ft_dlist_clear(&g_list, ft_dlist_deleter);
+	return (0);
+}
+
+int		run()
+{
+	int	code;
+
+	code = 0;
 	code += run_test(&tests[DLIST_ADD5]);
 	code += run_test(&tests[DLIST_DELTAIL5]);
 	code += run_test(&tests[DLIST_ADD5]);
@@ -177,6 +191,16 @@ int		main(void)
 	code += run_test(&tests[DLIST_DELRAND5]);
 	code += run_test(&tests[DLIST_ADD5]);
 	code += run_test(&tests[DLIST_CLEAR]);
-	ft_dlist_clear(&g_list, ft_dlist_deleter);
+	return (code);
+
+}
+
+int		main(void)
+{
+	int		code;
+
+	code = init();
+	code += run();
+	code += reset();
 	return (code);
 }
