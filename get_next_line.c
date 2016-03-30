@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:17 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/30 12:15:49 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/30 16:17:04 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ t_fd			*ft_init_fd(t_dlist *fds, int const fdi)
 	}
 	if (fd->init)
 		return (fd);
+	fd->eof = 0;
 	fd->fd = fdi;
 	fd->init = TRUE;
 	fd->code = READ_OK;
@@ -73,14 +74,12 @@ int				ft_push_fd(t_fd *fd)
 	{
 		*pcur = 0;
 		pdup = ft_strdup(pstart);
-		printf("block: \"%s\"\n", pdup);
 		ft_dlist_add_front_str(&fd->lines, pdup, NF_DESTROY_ALL);
 		pstart = pcur + 1;
 	}
 	if (pstart < pend)
 	{
 		pdup = ft_strdup(pstart);
-		printf("block: \"%s\"\n", pdup);
 		ft_dlist_add_back_str(&fd->lines, pdup, NF_DESTROY_ALL);
 	}
 	ft_bzero(fd->buf, BUFF_SIZE);
@@ -101,18 +100,19 @@ int				ft_process_fd(t_dlist *fds, t_fd *fd, char **line)
 {
 	t_dnode		*cur;
 
+	fd->eof = 1;
 	fd->code = READ_OK;
 	if (!FD_HAS_LINE(fd))
 	{
 		FD_CLEAR_LINES(fd);
 		if ((cur = FD_NODE(fds, fd)))
 			ft_dlist_remove(fds, cur, ft_dlist_deleter);
+		*line = NULL;
 		return (READ_EOF);
 	}
-	cur = fd->lines.tail;
+	cur = fd->lines.head;
 	*line = cur->data;
 	cur->data = NULL;
-	printf("process: %s\n", line ? *line : "NULL");
 	ft_dlist_remove(&fd->lines, cur, ft_dlist_deleter);
 	return (fd->code);
 }
@@ -125,7 +125,7 @@ int				get_next_line(int const fd, char **line)
 	if (fd < 0 || !line)
 		return (READ_ERR);
 	pfd = ft_init_fd(&fds, fd);
-	if (!FD_HAS_LINE(pfd))
+	if (!pfd->eof && !FD_HAS_LINE(pfd))
 	{
 		while (ft_read_fd(pfd) == READ_OK)
 			ft_push_fd(pfd);

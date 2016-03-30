@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:07 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/28 10:37:52 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/30 15:56:54 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ typedef struct	s_fd
 	int			count;
 	char		buf[BUFF_SIZE];
 	t_dlist		lines;
+	int			eof;
 }				t_fd;
 
 t_fd			*ft_init_fd(t_dlist *fds, int const fdi);
