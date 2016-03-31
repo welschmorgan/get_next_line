@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/30 12:17:08 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/31 14:23:35 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/31 15:17:51 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,8 @@ int		test_simple(t_test *test)
 	char		*s2 = "ijklmnop";
 	size_t const l1 = strlen(s1);
 	size_t const l2 = strlen(s2);
-	char		*gs1, *gs2;
-	int			rs1, rs2;
+	char		*gs1, *gs2, *gs3;
+	int			rs1, rs2, rs3;
 
 	if ((code = open_pipe()))
 		return (code);
@@ -36,6 +36,7 @@ int		test_simple(t_test *test)
 	close(g_pipe_fd[1]);
 	rs1 = read_pipe(&gs1, get_next_line);
 	rs2 = read_pipe(&gs2, get_next_line);
+	rs3 = read_pipe(&gs3, get_next_line);
 	close(g_pipe_fd[0]);
 	if (!gs1 || strncmp(gs1, s1, l1 - 1))
 		return (error_test(test, 1, "line[0] should be '%s', got '%s'", s1, gs1));
@@ -43,6 +44,12 @@ int		test_simple(t_test *test)
 	if (!gs2 || strncmp(gs2, s2, l2 - 1))
 		return (error_test(test, 1, "line[1] should be '%s', got '%s'", s2, gs2));
 	printf("line[1] matches '%s'\n", s2);
+	if (rs1 != 1)
+		return (error_test(test, 1, "line[0] return should have been %d, got %d", 1, rs1));
+	if (rs2 != 1)
+		return (error_test(test, 1, "line[1] return should have been %d, got %d", 1, rs2));
+	if (rs3 != 0)
+		return (error_test(test, 1, "line[2] return should have been %d, got %d", 0, rs3));
 	return (0);
 }
 
@@ -61,7 +68,6 @@ int		test_openfile(t_test *test)
 	printf("* opened \"%s\", fd#%d\n", path, fd);
 	line = 0;
 	code = 1;
-	buf = NULL;
 	while (code > 0)
 	{
 		code = get_next_line(fd, &buf);
