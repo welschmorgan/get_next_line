@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/30 13:40:24 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/30 15:32:18 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/03/31 12:51:28 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,31 @@
 #include "libft.h"
 #include <stdio.h>
 #include <stdarg.h>
+#include <unistd.h>
 
 t_test			*g_test = NULL;
+int				g_pipe_fd[2];
+
+int				open_pipe()
+{
+	int		code;
+
+	if ((code = pipe(g_pipe_fd)) != 0)
+		return (code);
+	if (g_pipe_fd[0] < 0 || g_pipe_fd[1] < 0)
+		return (1);
+	return (0);
+}
+
+int				write_pipe(char const *str, size_t const n)
+{
+	return (write(g_pipe_fd[1], str, n));
+}
+
+int				read_pipe(char **line, int(*fn)(int, char **))
+{
+	return (fn(g_pipe_fd[0], line));
+}
 
 int				init_test(t_test *test, char const *name, t_test_fn fn)
 {
@@ -23,6 +46,7 @@ int				init_test(t_test *test, char const *name, t_test_fn fn)
 		return (1);
 	strncpy(test->name, name, TEST_NAME_SIZE);
 	strncpy(test->error, "", TEST_ERROR_SIZE);
+	memset(test->user_data, 0, sizeof(void*) * TEST_DATA_SLOTS);
 	test->func = fn;
 	test->code = 0;
 	test->signal = -1;
@@ -91,4 +115,16 @@ int				run_test(t_test *test)
 	if (test->code)
 		printf("\nreturned: %i -> %s\n", test->code, test->error);
 	return (test->code);
+}
+
+void		print_tests_results(t_test const *tests, size_t n)
+{
+	t_test const	*ptest;
+	printf("** Tests Results:");
+	while (n)
+	{
+		ptest = &tests[n];
+		printf("*\ttest[%ld]: %s\n\t-> return:%d\terror:\"%s\"\tsignal:%d\n", n, ptest->name, ptest->code, ptest->error, ptest->signal);
+		n--;
+	}
 }
