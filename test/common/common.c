@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/30 13:40:24 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/04/01 13:51:51 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/04/01 14:54:21 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,29 @@
 
 static t_test_suite	*g_test_suite = NULL;
 int					g_pipe_fd[2];
+
+
+int		assert_test(t_test *test,
+					int cond,
+					char const *condstr,
+					char const *fmt,
+					...)
+{
+	static char	buf[1024] = {0};
+	va_list		args;
+	size_t		len;
+
+	if (!test)
+		return (1);
+	snprintf(buf, 1024, "assertion failed (%s): ", condstr);
+	len = strlen(buf);
+	va_start(args, fmt);
+	vsnprintf(buf + len, 1024 - len, fmt, args);
+	va_end(args);
+	if (!cond)
+		error_test(test, 1, buf);
+	return (!cond);
+}
 
 t_test			*current_test()
 {

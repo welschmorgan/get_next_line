@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/30 12:17:08 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/04/01 13:41:36 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/04/01 15:08:03 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 #include "get_next_line.h"
 #include <unistd.h>
 #include <fcntl.h>
+#include <assert.h>
+#include <stdarg.h>
 
 static t_test_suite		g_main_test_suite;
 t_test					tests[TEST_COUNT];
@@ -37,17 +39,15 @@ int		libc_get_next_line(int const fd, char **line)
 }
 
 int		validate_read(t_test *test, char const *prefix,
-					  char *s_read, char *s_libc,
+					  char const *s_read, char const *s_libc,
 					  int const c_read, int const c_libc)
 {
 	int	str = ((s_libc && s_read && !strcmp(s_libc, s_read)) || s_read == s_libc);
 	int code = (c_read == c_libc);
 
-	log_test(test, "%s: %s.", prefix, s_read);
-	if (!str)
-		return (error_test(test, 1, "string mismatch: %s: expected '%s' but got '%s'.", prefix, s_libc, s_read));
-	if (!code)
-		return (error_test(test, 1, "return mismatch: %s: expected %d but got %d.", prefix, c_libc, c_read));
+	log_test(test, "%s: %s (got %u/%u chars).", prefix, s_read, (s_read ? (ssize_t)strlen(s_read) : -1), (s_libc ? (ssize_t)strlen(s_libc) : -1));
+	ASSERT_TEST(test, str, "string mismatch: %s: expected '%s' but got '%s'.", prefix, s_libc, s_read);
+	ASSERT_TEST(test, code, "return mismatch: %s: expected %d but got %d.", prefix, c_libc, c_read);
 	return (0);
 }
 
@@ -99,6 +99,7 @@ int		test_simple(t_test *test)
 
 	if ((code = open_pipe()))
 		return (code);
+
 	write_pipe(s1, l1);
 	write_pipe("\n", 1);
 	write_pipe(s2, l2);
@@ -121,6 +122,47 @@ int		test_simple(t_test *test)
 	return (code);
 }
 
+int		test_6_lines_of_8(t_test *test)
+{
+	int				code;
+	size_t const	nstrs	= 6;
+	char const		*strs[]	= {
+		"abcdefgh",
+		"ijklmnop",
+		"qrstuvwx",
+		"yzabcdef",
+		"ghijklmn",
+		"opqrstuv",
+	};
+	char			*line;
+	size_t			i;
+	char			lineid_buf[10];
+	int				ret;
+
+	if ((code = open_pipe()))
+		return (code);
+	i = 0;
+	while (i < nstrs)
+	{
+		write(g_pipe_fd[1], strs[i], 8);
+		write(g_pipe_fd[1], "\n", 1);
+		i++;
+	}
+	close(g_pipe_fd[1]);
+	i = 0;
+	code = 0;
+	line = NULL;
+	while (i <= nstrs && !code)
+	{
+		ret = read_pipe(&line, get_next_line);
+		snprintf(&lineid_buf[0], 10, "line#%ld", i);
+		code = validate_read(test, lineid_buf, line, strs[i], ret, i < nstrs);
+		ft_strdel(&line);
+		i++;
+	}
+	close(g_pipe_fd[0]);
+	return (code);
+}
 int		test_openfile(t_test *test)
 {
 	int	code;
@@ -156,6 +198,7 @@ int		init(int argc, char const *argv[])
 	if (init_test_suite(&g_main_test_suite, "tests.log", argc, argv))
 		return (1);
 	push_test_suite(&g_main_test_suite, "reads 2 lines of 8 chars (no \\n at end) (LIBC)", test_libc_simple);
+	push_test_suite(&g_main_test_suite, "reads 6 lines of 8 chars (with \\n)", test_6_lines_of_8);
 	push_test_suite(&g_main_test_suite, "reads 2 lines of 8 chars (no \\n at end)", test_simple);
 	push_test_suite(&g_main_test_suite, "reads all lines contained in supplied filename", test_openfile);
 	return (0);
