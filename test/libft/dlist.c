@@ -6,15 +6,15 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/30 12:17:08 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/30 15:33:18 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/04/01 13:04:49 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "dlist.h"
 # include <time.h>
 
-t_dlist	g_list;
-t_test	tests[DLIST_COUNT];
+t_test_suite	g_main_test_suite;
+t_dlist			g_list;
 
 void	print_dlist(t_dlist *lst, int rev)
 {
@@ -156,50 +156,39 @@ int		test_dlist_delrand5(t_test *test)
 	return (0);
 }
 
-int		init(void)
+int		init(int argc, char const *argv[])
 {
 	int	code;
 
 	code = 0;
 	srand(time(NULL));
-	printf("* initializing dlist\n");
 	ft_dlist_init(&g_list);
-	init_test(&tests[DLIST_ADD5], "add 5 at back", test_dlist_add5);
-	init_test(&tests[DLIST_DELTAIL5], "delete 5 at tail", test_dlist_deltail5);
-	init_test(&tests[DLIST_DELHEAD5], "delete 5 at head", test_dlist_delhead5);
-	init_test(&tests[DLIST_CLEAR], "clear all", test_dlist_clear);
-	init_test(&tests[DLIST_DELRAND5], "delete 5 randomly", test_dlist_delrand5);
+	init_test_suite(&g_main_test_suite, "tests.log", argc, argv);
+	push_test_suite(&g_main_test_suite, "add 5 at back", test_dlist_add5);
+	push_test_suite(&g_main_test_suite, "delete 5 at tail", test_dlist_deltail5);
+	push_test_suite(&g_main_test_suite, "delete 5 at head", test_dlist_delhead5);
+	push_test_suite(&g_main_test_suite, "clear all", test_dlist_clear);
+	push_test_suite(&g_main_test_suite, "delete 5 randomly", test_dlist_delrand5);
 	return (code);
 }
 
 int		reset(void)
 {
 	ft_dlist_clear(&g_list, ft_dlist_deleter);
+	reset_test_suite(&g_main_test_suite);
 	return (0);
 }
 
 int		run()
 {
-	int	code;
-
-	code = 0;
-	code += run_test(&tests[DLIST_ADD5]);
-	code += run_test(&tests[DLIST_DELTAIL5]);
-	code += run_test(&tests[DLIST_ADD5]);
-	code += run_test(&tests[DLIST_DELHEAD5]);
-	code += run_test(&tests[DLIST_ADD5]);
-	code += run_test(&tests[DLIST_DELRAND5]);
-	code += run_test(&tests[DLIST_ADD5]);
-	code += run_test(&tests[DLIST_CLEAR]);
-	return (code);
-
+	return (run_test_suite(&g_main_test_suite));
 }
 
-int		main(void)
+int		main(int argc, char const *argv[])
 {
 	int		code;
 
-	code = init();
+	code = init(argc, argv);
 	code += run();
 	code += reset();
 	return (code);

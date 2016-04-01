@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/30 14:04:19 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/31 12:26:54 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/04/01 10:55:41 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ typedef enum	e_test_data_id
 typedef enum	e_test_id
 {
 	TEST_SIMPLE,
+	TEST_LIBC,
 	TEST_OPEN_FILE,
 	TEST_COUNT
 }				t_test_id;

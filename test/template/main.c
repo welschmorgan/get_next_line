@@ -1,49 +1,47 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   dlist.c                                            :+:      :+:    :+:   */
+/*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/30 12:17:08 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/31 11:03:41 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/04/01 13:04:29 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "main.h"
 # include <time.h>
 
-t_test	tests[TEST_COUNT];
+static t_test_suite	g_main_test_suite;
+t_dlist				g_list;
 
 int		test_dummy(t_test *test)
 {
-	printf("* starting test \"%s\"\n", test->name);
-	return (0);
+	(void)test;
+	int		times = 5;
+	t_dnode	*part;
+	static unsigned const	ndata = 5;
+
+	log_test(test, "im a dummy!");
+	return (error_test(test, 1, "dummy error"));
 }
 
-int		init(void)
+int		init(int argc, char const *argv[])
 {
-	int	code;
-
-	code = 0;
-	init_test(&tests[TEST_DUMMY], "dummy template test", test_dummy);
-	return (code);
+	init_test_suite(&g_main_test_suite, "tests.log", argc, argv);
+	push_test_suite(&g_main_test_suite, "dummy test, testing nothing", test_dummy);
 }
 
 int		reset(void)
 {
-	reset_test(&tests[TEST_DUMMY]);
+	reset_test_suite(&g_main_test_suite);
 	return (0);
 }
 
 int		run()
 {
-	int	code;
-
-	code = 0;
-	code += run_test(&tests[TEST_DUMMY]);
-	return (code);
-
+	return (run_test_suite(&g_main_test_suite));
 }
 
 int		main(void)

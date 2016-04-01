@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/30 12:17:08 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/31 15:17:51 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/04/01 13:41:36 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,83 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-t_test	tests[TEST_COUNT];
+static t_test_suite		g_main_test_suite;
+t_test					tests[TEST_COUNT];
+
+int		libc_get_next_line(int const fd, char **line)
+{
+	size_t			linecapp = 0;
+	FILE			*file;
+	int				code;
+	file = fdopen(fd, "r");
+	if (!file)
+		return (-1);
+	*line = NULL;
+	code = getline(line, &linecapp, file);
+	ft_strrtrim(*line, "\n");
+	if (code > 0)
+		return (1);
+	else if (code < 0)
+		return (-1);
+	return (0);
+}
+
+int		validate_read(t_test *test, char const *prefix,
+					  char *s_read, char *s_libc,
+					  int const c_read, int const c_libc)
+{
+	int	str = ((s_libc && s_read && !strcmp(s_libc, s_read)) || s_read == s_libc);
+	int code = (c_read == c_libc);
+
+	log_test(test, "%s: %s.", prefix, s_read);
+	if (!str)
+		return (error_test(test, 1, "string mismatch: %s: expected '%s' but got '%s'.", prefix, s_libc, s_read));
+	if (!code)
+		return (error_test(test, 1, "return mismatch: %s: expected %d but got %d.", prefix, c_libc, c_read));
+	return (0);
+}
+
+int		test_libc_simple(t_test *test)
+{
+	int			code;
+	char		*s1 = "abcdefgh";
+	char		*s2 = "ijklmnop";
+	char		*s3 = NULL;
+	size_t const l1 = strlen(s1);
+	size_t const l2 = strlen(s2);
+	char		*gs1 = NULL, *gs2 = NULL, *gs3 = NULL;
+	int			rs1, rs2, rs3;
+
+	if ((code = open_pipe()))
+		return (code);
+	write_pipe(s1, l1);
+	write_pipe("\n", 1);
+	write_pipe(s2, l2);
+	write_pipe("\n", 1);
+	close(g_pipe_fd[1]);
+	rs1 = read_pipe(&gs1, libc_get_next_line);
+	rs2 = read_pipe(&gs2, libc_get_next_line);
+	rs3 = read_pipe(&gs3, libc_get_next_line);
+	close(g_pipe_fd[0]);
+	code = 0;
+	if (!code)
+		code = validate_read(test, "line#0", gs1, s1, rs1, 1);
+	if (!code)
+		code = validate_read(test, "line#1", gs2, s2, rs2, 1);
+	if (!code)
+		code = validate_read(test, "line#2", gs3, s3, rs3, 0);
+	ft_strdel(&gs1);
+	ft_strdel(&gs2);
+	ft_strdel(&gs3);
+	return (code);
+}
 
 int		test_simple(t_test *test)
 {
 	int			code;
 	char		*s1 = "abcdefgh";
 	char		*s2 = "ijklmnop";
+	char		*s3 = NULL;
 	size_t const l1 = strlen(s1);
 	size_t const l2 = strlen(s2);
 	char		*gs1, *gs2, *gs3;
@@ -38,19 +108,17 @@ int		test_simple(t_test *test)
 	rs2 = read_pipe(&gs2, get_next_line);
 	rs3 = read_pipe(&gs3, get_next_line);
 	close(g_pipe_fd[0]);
-	if (!gs1 || strncmp(gs1, s1, l1 - 1))
-		return (error_test(test, 1, "line[0] should be '%s', got '%s'", s1, gs1));
-	printf("line[0] matches '%s'\n", s1);
-	if (!gs2 || strncmp(gs2, s2, l2 - 1))
-		return (error_test(test, 1, "line[1] should be '%s', got '%s'", s2, gs2));
-	printf("line[1] matches '%s'\n", s2);
-	if (rs1 != 1)
-		return (error_test(test, 1, "line[0] return should have been %d, got %d", 1, rs1));
-	if (rs2 != 1)
-		return (error_test(test, 1, "line[1] return should have been %d, got %d", 1, rs2));
-	if (rs3 != 0)
-		return (error_test(test, 1, "line[2] return should have been %d, got %d", 0, rs3));
-	return (0);
+	code = 0;
+	if (!code)
+		code = validate_read(test, "line#0", gs1, s1, rs1, 1);
+	if (!code)
+		code = validate_read(test, "line#1", gs2, s2, rs2, 1);
+	if (!code)
+		code = validate_read(test, "line#2", gs3, s3, rs3, 0);
+	ft_strdel(&gs1);
+	ft_strdel(&gs2);
+	ft_strdel(&gs3);
+	return (code);
 }
 
 int		test_openfile(t_test *test)
@@ -78,54 +146,34 @@ int		test_openfile(t_test *test)
 	return (0);
 }
 
-int		init(int argc, char *argv[])
+int		init(int argc, char const *argv[])
 {
-	int	i, j;
-
-	printf("%d/%d args allowed!\n", argc, TEST_DATA_SLOTS);
 	if (argc >= TEST_DATA_SLOTS)
 	{
 		printf("only %d args allowed!\n", TEST_DATA_SLOTS);
 		return (1);
 	}
-	init_test(&tests[TEST_SIMPLE], "reads 2 lines of 8 chars (no \\n at end)", test_simple);
-	init_test(&tests[TEST_OPEN_FILE], "reads all lines contained in supplied filename", test_openfile);
-	if (argc > 1)
-	{
-		i = 1;
-		while (i < argc)
-		{
-			if (!argv[i])
-				continue ;
-			printf ("\targv[%d] = '%s' -> user_data[%d]\n", i, argv[i], i - 1);
-			j = 0;
-			while (j < TEST_COUNT)
-				tests[j++].user_data[i - 1] = argv[i];
-			i++;
-		}
-	}
+	if (init_test_suite(&g_main_test_suite, "tests.log", argc, argv))
+		return (1);
+	push_test_suite(&g_main_test_suite, "reads 2 lines of 8 chars (no \\n at end) (LIBC)", test_libc_simple);
+	push_test_suite(&g_main_test_suite, "reads 2 lines of 8 chars (no \\n at end)", test_simple);
+	push_test_suite(&g_main_test_suite, "reads all lines contained in supplied filename", test_openfile);
 	return (0);
 }
 
 int		reset(void)
 {
-	reset_test(&tests[TEST_SIMPLE]);
-	reset_test(&tests[TEST_OPEN_FILE]);
+	reset_test_suite(&g_main_test_suite);
 	return (0);
 }
 
 int		run()
 {
-	int	code;
-
-	code = 0;
-	code += run_test(&tests[TEST_SIMPLE]);
-	code += run_test(&tests[TEST_OPEN_FILE]);
-	return (code);
+	return (run_test_suite(&g_main_test_suite));
 
 }
 
-int		main(int argc, char *argv[])
+int		main(int argc, char const *argv[])
 {
 	int		code;
 
