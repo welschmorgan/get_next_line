@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/25 11:20:17 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/03/31 15:14:02 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/04/02 15:19:21 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ t_fd			*ft_init_fd(t_dlist *fds, int const fdi)
 	}
 	if (fd->init)
 		return (fd);
+	fd->overflow = 0;
 	fd->eof = 0;
 	fd->fd = fdi;
 	fd->init = TRUE;
@@ -73,16 +74,33 @@ int				ft_push_fd(t_fd *fd)
 	while ((pcur = ft_strchr(pstart, '\n')) && pcur < pend)
 	{
 		*pcur = 0;
-		pdup = ft_strdup(pstart);
-		ft_dlist_add_front_str(&fd->lines, pdup, NF_DESTROY_ALL);
+		pdup = fd->overflow
+			? ft_strjoin((char*)fd->lines.head->data, pstart)
+			: ft_strdup(pstart);
+		printf("[PUSH] %s.\n", pdup);
+		if (fd->overflow)
+		{
+			ft_dlist_remove(&fd->lines, fd->lines.head, ft_dlist_deleter);
+			fd->overflow = 0;
+		}
+		ft_dlist_add_back_str(&fd->lines, pdup, NF_DESTROY_ALL);
 		pstart = pcur + 1;
 	}
 	if (pstart < pend)
 	{
-		pdup = ft_strdup(pstart);
+		pdup = fd->overflow
+			? ft_strjoin((char*)fd->lines.head->data, pstart)
+			: ft_strdup(pstart);
+		printf("[PUSH] %s.\n", pdup);
+		if (fd->overflow)
+		{
+			ft_dlist_remove(&fd->lines, fd->lines.head, ft_dlist_deleter);
+			fd->overflow = 0;
+		}
 		ft_dlist_add_back_str(&fd->lines, pdup, NF_DESTROY_ALL);
 	}
 	ft_bzero(fd->buf, BUFF_SIZE);
+	fd->overflow = (fd->count >= BUFF_SIZE);
 	return (fd->code);
 }
 
@@ -100,9 +118,8 @@ int				ft_process_fd(t_dlist *fds, t_fd *fd, char **line)
 {
 	t_dnode		*cur;
 
-	fd->eof = 1;
 	fd->code = READ_OK;
-	if (!FD_HAS_LINE(fd))
+	if (fd->eof && !FD_HAS_LINE(fd))
 	{
 		fd->eof = 0;
 		FD_CLEAR_LINES(fd);
@@ -111,7 +128,7 @@ int				ft_process_fd(t_dlist *fds, t_fd *fd, char **line)
 		*line = NULL;
 		return (READ_EOF);
 	}
-	cur = fd->lines.head;
+	cur = fd->lines.tail;
 	*line = cur->data;
 	cur->data = NULL;
 	ft_dlist_remove(&fd->lines, cur, ft_dlist_deleter);
@@ -122,14 +139,20 @@ int				get_next_line(int const fd, char **line)
 {
 	static t_dlist	fds;
 	t_fd			*pfd;
+	int				code;
 
 	if (fd < 0 || !line)
 		return (READ_ERR);
 	pfd = ft_init_fd(&fds, fd);
-	if (!pfd->eof && !FD_HAS_LINE(pfd))
+	if (!FD_HAS_LINE(pfd))
 	{
-		while (ft_read_fd(pfd) == READ_OK)
-			ft_push_fd(pfd);
+		while (!pfd->eof)
+		{
+			while ((code = ft_read_fd(pfd)) == READ_OK)
+				ft_push_fd(pfd);
+			if (code == READ_EOF)
+				pfd->eof = 1;
+		}
 	}
 	return (FD_PROCESS(&fds, pfd, line));
 }

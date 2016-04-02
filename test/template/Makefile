@@ -8,7 +8,7 @@ OBJS=$(patsubst %.c,%.o,$(SRCS))
 COBJS=$(patsubst %.c,%.o,$(CSRCS))
 APPS=$(patsubst %.c,%.run,$(SRCS))
 DSYMS=$(patsubst %.c,%.run.dSYM,$(SRCS))
-NOBJS=$(shell echo $(OBJS) $(COBJS) | wc -w)
+NOBJS=$(shell echo "$(APPS) $(OBJS)" | wc -w)
 
 CFLAGS = -Wall -Wextra -Werror -I. -I.. -I../.. -I$(LIBFT_DIR)/includes -I$(COMM_DIR) -g
 LDFLAGS = -L$(LIBFT_DIR)/ -lft
@@ -24,7 +24,6 @@ $(COMM_DIR)/%.o: $(COMM_DIR)/%.c
 	@PRCT=$$( echo "scale=1; $(COUNT) / $(NOBJS) * 100.0" | bc $(VOID_STDERR) ); \
 	printf "\r\033[K[$(CC)|%s%%] compiling %s into %s ... " "$$PRCT" "$<" "$@"; \
 	$(CC) $(CFLAGS) -c -o $@ $^; \
-	$(eval COUNT = $(shell echo "$(COUNT) + 1" | bc) ) \
 	printf "\r\033[K[$(CC)|%s%%] compiled %s into %s ... " "$$PRCT" "$<" "$@"; \
 
 %.o: %.c
@@ -38,6 +37,7 @@ $(COMM_DIR)/%.o: $(COMM_DIR)/%.c
 	@PRCT=$$( echo "scale=1; $(COUNT) / $(NOBJS) * 100.0" | bc $(VOID_STDERR)); \
 	printf "\r\033[K[$(CC)|%s%%] Linking $@" "$$PRCT" ; \
 	$(LD) -o $@ $^ $(LDFLAGS) ; \
+	$(eval COUNT = $(shell echo "$(COUNT) + 1" | bc) ) \
 	printf "\r\033[K[$(CC)|%s%%] linked $@\n" "$$PRCT";
 
 all: $(COBJS) $(OBJS) $(APPS)

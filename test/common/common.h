@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/30 13:37:45 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/04/01 15:01:28 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/04/02 12:16:10 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <stdlib.h>
 # include <signal.h>
 # include <time.h>
+# include <string.h>
 
 # include "libft.h"
 
@@ -58,6 +59,21 @@ int						assert_test(t_test *test,
 int						write_pipe(char const *str, size_t const n);
 int						read_pipe(char **line, int(*fn)(int, char **));
 int						open_pipe();
+
+int						write_pipe_strings(size_t const n, int const nstrs, char const **strs);
+int						read_pipe_strings(int const nstrs, char **gots, int *rets, int(*reader)(int, char**));
+int						delete_piped_strings(int const nstrs, char **gots, int *rets);
+int						test_strings(size_t const n, int const nstrs, char const **strs,
+									 int (*reader)(int, char **),
+									 int (*match_str)(size_t const n, char const *wanted, char const *got),
+									 int (*match_return)(int wanted, int got));
+int						validate_piped_strings(size_t const n,
+											   int const nstrs,
+											   char const **wanted,
+											   char const **got,
+											   int const *rets,
+											   int (*match_str)(size_t const n, char const *wanted, char const *got),
+											   int (*match_return)(int wanted, int got));
 
 typedef struct			s_test_suite
 {

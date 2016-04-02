@@ -6,7 +6,7 @@
 /*   By: mwelsch <mwelsch@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/30 13:40:24 by mwelsch           #+#    #+#             */
-/*   Updated: 2016/04/01 14:54:21 by mwelsch          ###   ########.fr       */
+/*   Updated: 2016/04/02 13:48:15 by mwelsch          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,14 @@ int				open_pipe()
 
 int				write_pipe(char const *str, size_t const n)
 {
-	return (write(g_pipe_fd[1], str, n));
+	int			code;
+
+	if (!n)
+		return (0);
+	code = write(g_pipe_fd[1], str, n);
+	if (str[n - 1] != '\n')
+		code += write(g_pipe_fd[1], "\n", 1);
+	return (code);
 }
 
 int				read_pipe(char **line, int(*fn)(int, char **))
@@ -288,3 +295,100 @@ t_test_suite			*current_test_suite()
 {
 	return (g_test_suite);
 }
+
+int						write_pipe_strings(size_t const n, int const nstrs, char const **strs)
+{
+	int					i;
+
+	i = 0;
+	while (i < nstrs)
+	{
+		write_pipe(strs[i], n);
+		i++;
+	}
+	return (0);
+}
+int						delete_piped_strings(int const nstrs, char **gots, int *rets)
+{
+	int					i;
+	i = 0;
+	while (i < nstrs)
+	{
+		if (gots)
+			free((void*)gots[i]);
+		i++;
+	}
+	if (rets)
+		free((void*)rets);
+	if (gots)
+		free((void*)gots);
+	return (0);
+}
+
+int						read_pipe_strings(int const nstrs, char **gots, int *rets, int(*reader)(int, char**))
+{
+	int					i;
+
+	i = 0;
+	while (i < nstrs)
+	{
+		rets[i] = read_pipe(&gots[i], reader);
+		i++;
+	}
+	return (0);
+}
+
+int						validate_piped_strings(size_t const n,
+											   int const nstrs,
+											   char const **wanted,
+											   char const **got,
+											   int const *rets,
+											   int (*match_str)(size_t const n, char const *wanted, char const *got),
+											   int (*match_return)(int wanted, int got))
+{
+	int				code, i;
+
+	i = code = 0;
+	while (i < nstrs && !code)
+	{
+		if (!code)
+			code = match_str(n, wanted[i], got[i]);
+		if (!code)
+			code = match_return(1, rets[i]);
+		i++;
+	}
+	return (code);
+}
+
+int					test_strings(size_t const n, int const nstrs, char const **strs,
+								 int (*reader)(int, char **),
+								 int (*match_str)(size_t const n, char const *wanted, char const *got),
+								 int (*match_return)(int wanted, int got))
+{
+	char			**gots;
+	int				*rets;
+	int				code;
+
+	if ((code = open_pipe()) || !n)
+		return (code);
+	rets = malloc(sizeof(int) * nstrs);
+	gots = malloc(sizeof(char*) * nstrs);
+	memset((void*)gots, 0, sizeof(char*) * nstrs);
+	write_pipe_strings(n, nstrs, strs);
+	close(g_pipe_fd[1]);
+	read_pipe_strings(nstrs, gots, rets, reader);
+	close(g_pipe_fd[0]);
+	code = validate_piped_strings(n, nstrs, strs, (char const **)gots, rets, match_str, match_return);
+	delete_piped_strings(nstrs, gots, rets);
+	return (code);
+}
+
+
+
+
+
+
+
+
+
+
